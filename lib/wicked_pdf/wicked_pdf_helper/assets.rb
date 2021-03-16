@@ -45,28 +45,20 @@ class WickedPdf
       def wicked_pdf_stylesheet_pack_tag(*sources)
         return unless defined?(Webpacker)
 
-        if running_in_development?
-          stylesheet_pack_tag(*sources)
-        else
-          css_text = sources.collect do |source|
-            source = WickedPdfHelper.add_extension(source, 'css')
-            wicked_pdf_stylesheet_link_tag(webpacker_source_url(source))
-          end.join("\n")
-          css_text.respond_to?(:html_safe) ? css_text.html_safe : css_text
-        end
+        css_text = sources.collect do |source|
+          source = WickedPdfHelper.add_extension(source, 'css')
+          wicked_pdf_stylesheet_link_tag(webpacker_source_url(source))
+        end.join("\n")
+        css_text.respond_to?(:html_safe) ? css_text.html_safe : css_text
       end
 
       def wicked_pdf_javascript_pack_tag(*sources)
         return unless defined?(Webpacker)
 
-        if running_in_development?
-          javascript_pack_tag(*sources)
-        else
-          sources.collect do |source|
-            source = WickedPdfHelper.add_extension(source, 'js')
-            "<script type='text/javascript'>#{read_asset(webpacker_source_url(source))}</script>"
-          end.join("\n").html_safe
-        end
+        sources.collect do |source|
+          source = WickedPdfHelper.add_extension(source, 'js')
+          "<script type='text/javascript'>#{read_asset(webpacker_source_url(source))}</script>"
+        end.join("\n").html_safe
       end
 
       def wicked_pdf_image_tag(img, options = {})
@@ -96,11 +88,7 @@ class WickedPdf
       def wicked_pdf_asset_pack_path(asset)
         return unless defined?(Webpacker)
 
-        if running_in_development?
-          asset_pack_path(asset)
-        else
-          wicked_pdf_asset_path webpacker_source_url(asset)
-        end
+        wicked_pdf_asset_path webpacker_source_url(asset)
       end
 
       private
@@ -194,17 +182,6 @@ class WickedPdf
           source_path = asset_pack_path(source)
           # Remove last slash from root path
           root_url[0...-1] + source_path
-        end
-      end
-
-      def running_in_development?
-        return unless Assets.webpacker_version
-
-        # :dev_server method was added in webpacker 3.0.0
-        if Webpacker.respond_to?(:dev_server)
-          Webpacker.dev_server.running?
-        else
-          Rails.env.development? || Rails.env.test?
         end
       end
 
